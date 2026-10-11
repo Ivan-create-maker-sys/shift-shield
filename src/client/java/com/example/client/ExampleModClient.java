@@ -18,7 +18,7 @@ public class ExampleModClient implements ClientModInitializer {
 		var player = mc.player;
 		if (player == null || mc.gameMode == null) return;
 
-		boolean sneaking = mc.screen == null && mc.options.keyShift.isDown();
+		boolean sneaking = mc.options.keyShift.isDown();
 
 		InteractionHand hand = null;
 		if (player.getMainHandItem().is(Items.SHIELD)) {
