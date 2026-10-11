@@ -7,8 +7,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
 
 public class ExampleModClient implements ClientModInitializer {
+	// Задержка перед повторным подъёмом щита, в тиках (20 тиков = 1 секунда)
+	private static final int RAISE_DELAY_TICKS = 4;
+
 	public static volatile boolean suppressRelease = false;
 	private boolean raisedByMod = false;
+	private int cooldown = 0;
 
 	@Override
 	public void onInitializeClient() {
@@ -49,10 +53,18 @@ public class ExampleModClient implements ClientModInitializer {
 		if (player == null || mc.gameMode == null) {
 			raisedByMod = false;
 			suppressRelease = false;
+			cooldown = 0;
 			return;
 		}
 
 		boolean sneaking = mc.options.keyShift.isDown();
+		boolean busy = isPlacing(mc) || isAttacking(mc);
+
+		if (busy) {
+			cooldown = RAISE_DELAY_TICKS;
+		} else if (cooldown > 0) {
+			cooldown--;
+		}
 
 		InteractionHand hand = null;
 		if (player.getMainHandItem().is(Items.SHIELD)) {
@@ -61,8 +73,7 @@ public class ExampleModClient implements ClientModInitializer {
 			hand = InteractionHand.OFF_HAND;
 		}
 
-		boolean want = sneaking && hand != null
-				&& !isPlacing(mc) && !isAttacking(mc);
+		boolean want = sneaking && hand != null && !busy && cooldown == 0;
 
 		if (raisedByMod && !player.isUsingItem()) {
 			raisedByMod = false;
