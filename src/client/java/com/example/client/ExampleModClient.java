@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Items;
 
 public class ExampleModClient implements ClientModInitializer {
+	public static volatile boolean suppressRelease = false;
 	private boolean raisedByMod = false;
 
 	@Override
@@ -27,14 +28,19 @@ public class ExampleModClient implements ClientModInitializer {
 		return mc.options.keyAttack.isDown();
 	}
 
+	private void releaseShield(Minecraft mc) {
+		suppressRelease = false;
+		mc.gameMode.releaseUsingItem(mc.player);
+		raisedByMod = false;
+	}
+
 	private void startTick(Minecraft mc) {
 		var player = mc.player;
 		if (player == null || mc.gameMode == null) return;
 
 		if (raisedByMod && player.isUsingItem()
 				&& (isPlacing(mc) || isAttacking(mc))) {
-			mc.gameMode.releaseUsingItem(player);
-			raisedByMod = false;
+			releaseShield(mc);
 		}
 	}
 
@@ -42,6 +48,7 @@ public class ExampleModClient implements ClientModInitializer {
 		var player = mc.player;
 		if (player == null || mc.gameMode == null) {
 			raisedByMod = false;
+			suppressRelease = false;
 			return;
 		}
 
@@ -59,14 +66,15 @@ public class ExampleModClient implements ClientModInitializer {
 
 		if (raisedByMod && !player.isUsingItem()) {
 			raisedByMod = false;
+			suppressRelease = false;
 		}
 
 		if (want && !player.isUsingItem()) {
+			suppressRelease = true;
 			mc.gameMode.useItem(player, hand);
 			raisedByMod = true;
 		} else if (!want && raisedByMod) {
-			mc.gameMode.releaseUsingItem(player);
-			raisedByMod = false;
+			releaseShield(mc);
 		}
 	}
 }
