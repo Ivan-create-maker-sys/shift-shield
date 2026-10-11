@@ -23,11 +23,16 @@ public class ExampleModClient implements ClientModInitializer {
 				&& !player.getMainHandItem().isEmpty();
 	}
 
+	private boolean isAttacking(Minecraft mc) {
+		return mc.options.keyAttack.isDown();
+	}
+
 	private void startTick(Minecraft mc) {
 		var player = mc.player;
 		if (player == null || mc.gameMode == null) return;
 
-		if (raisedByMod && player.isUsingItem() && isPlacing(mc)) {
+		if (raisedByMod && player.isUsingItem()
+				&& (isPlacing(mc) || isAttacking(mc))) {
 			mc.gameMode.releaseUsingItem(player);
 			raisedByMod = false;
 		}
@@ -49,7 +54,8 @@ public class ExampleModClient implements ClientModInitializer {
 			hand = InteractionHand.OFF_HAND;
 		}
 
-		boolean want = sneaking && hand != null && !isPlacing(mc);
+		boolean want = sneaking && hand != null
+				&& !isPlacing(mc) && !isAttacking(mc);
 
 		if (raisedByMod && !player.isUsingItem()) {
 			raisedByMod = false;
