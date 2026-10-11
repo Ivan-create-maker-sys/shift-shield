@@ -1,4 +1,4 @@
-package com.example.mixin.client;
+package com.example.client.mixin;
 
 import com.example.client.ExampleModClient;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
