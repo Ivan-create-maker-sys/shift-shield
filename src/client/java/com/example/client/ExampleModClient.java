@@ -8,7 +8,7 @@ import net.minecraft.world.item.Items;
 
 public class ExampleModClient implements ClientModInitializer {
 	// Задержка перед повторным подъёмом щита, в тиках (20 тиков = 1 секунда)
-	private static final int RAISE_DELAY_TICKS = 4;
+	private static final int RAISE_DELAY_TICKS = 5;
 
 	public static volatile boolean suppressRelease = false;
 	private boolean raisedByMod = false;
